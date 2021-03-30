@@ -1,0 +1,15 @@
+<ivy-module version="2.0">
+<info organisation="org.apache" module="hello-ivy"/>
+<dependencies>
+
+    <dependency org="javax.servlet" name="servlet-api" rev="2.5" />
+
+    <dependency org="junit" name="junit" rev="4.13.2" />
+
+    <dependency org="com.sun.faces" name="jsf-api" rev="2.2.8-17"/>
+
+    <dependency org="jakarta.annotation" name="jakarta.annotation-api" rev="1.3.5" />
+
+    <dependency org="org.primefaces.extensions" name="primefaces-extensions" rev="7.0"/>
+</dependencies>
+</ivy-module>

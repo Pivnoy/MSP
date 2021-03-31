@@ -1,0 +1,31 @@
+<project name="Low" xmlns:ivy="antlib:org.apache.ivy.ant" default="compile">
+
+    <target name="resolve">
+        <ivy:retrieve/>
+    </target>
+
+    <target name="compile" depends="resolve">
+        <mkdir dir="build/classes" />
+        <path id="build-path">
+            <fileset dir="lib" includes="*.jar"/>
+        </path>
+        <javac destdir="build/classes" includeantruntime="false">
+            <src path="src" />
+            <classpath refid="build-path"/>
+        </javac>
+    </target>
+
+    <target name="build" depends="compile">
+        <mkdir dir="out" />
+        <war destfile="out/Lab3.war" webxml="src/main/webapp/WEB-INF/web.xml">
+            <fileset dir="src"/>
+            <classes dir="build/classes"/>
+        </war>
+    </target>
+
+    <target name="clean" depends="compile">
+        <delete dir="build/classes/Controller"/>
+        <delete dir="build/classes/Model"/>
+    </target>
+
+</project>

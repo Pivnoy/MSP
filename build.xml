@@ -1,31 +1,112 @@
-<project name="Low" xmlns:ivy="antlib:org.apache.ivy.ant" default="compile">
+<project name="Web3" xmlns:ivy="antlib:org.apache.ivy.ant" default="build">
+    <loadproperties srcfile="ant.properties" />
 
+<!--    Ivy depends-->
     <target name="resolve">
         <ivy:retrieve/>
     </target>
 
+    <path id="build-path">
+        <fileset dir="${lib}" includes="*.jar"/>
+    </path>
+
+<!--    Компиляция исходных файлов-->
     <target name="compile" depends="resolve">
-        <mkdir dir="build/classes" />
-        <path id="build-path">
-            <fileset dir="lib" includes="*.jar"/>
-        </path>
-        <javac destdir="build/classes" includeantruntime="false">
-            <src path="src" />
-            <classpath refid="build-path"/>
+        <echo>Compile</echo>
+        <mkdir dir="${classes}" />
+        <javac destdir="${classes}" includeantruntime="false">
+            <src path="${main}" />
+            <exclude name="*/package-info.java"/>
+            <classpath refid="build-path" />
         </javac>
+
+        <path id="test-path">
+            <path refid="build-path" />
+            <pathelement location="${classes}" />
+        </path>
+
+        <mkdir dir="${tests}" />
+        <javac destdir="${tests}" includeantruntime="false">
+            <src path="${test}" />
+            <classpath refid="test-path"/>
+        </javac>
+        <echo>End Compile</echo>
     </target>
 
+<!--    Сборка проекта-->
     <target name="build" depends="compile">
-        <mkdir dir="out" />
-        <war destfile="out/Lab3.war" webxml="src/main/webapp/WEB-INF/web.xml">
-            <fileset dir="src"/>
-            <classes dir="build/classes"/>
+        <echo>Build</echo>
+        <mkdir dir="${out}"/>
+        <war destfile="${out}/${ant.project.name}.war" webxml="${main}/webapp/WEB-INF/web.xml">
+            <classes dir="${classes}"/>
+            <lib dir="${lib}"/>
+            <fileset dir="${main}/webapp/"/>
+            <manifest>
+                <attribute name="Created-By" value="Web" />
+                <attribute name="Manifest-Version" value="1.0" />
+                <attribute name="Main-Class" value="NoClass" />
+            </manifest>
         </war>
+        <echo>End Build</echo>
     </target>
 
-    <target name="clean" depends="compile">
-        <delete dir="build/classes/Controller"/>
-        <delete dir="build/classes/Model"/>
+<!--    Удаление временных и скомпилированных файлов-->
+    <target name="clean">
+        <echo>Clean</echo>
+        <delete dir="${build}" />
+        <delete dir="${tests}" />
+        <delete dir="${report}"/>
+        <echo>End Clean</echo>
+    </target>
+
+<!--    Запуск тестов-->
+    <target name="test" depends="build">
+        <echo>Start Testing</echo>
+        <junit haltonfailure="yes" printsummary="yes">
+            <classpath>
+                <pathelement path="${classes}"/>
+                <path refid="build-path"/>
+                <pathelement location="${tests}"/>
+            </classpath>
+            <test name="${testName}" todir="${report}"/>
+        </junit>
+        <echo>Continue Testing</echo>
+    </target>
+
+<!--    Репорт в случае успешного завершения тестов-->
+    <target name="report" depends="build">
+        <mkdir dir="${report}" />
+        <echo>Start Testing</echo>
+        <junit haltonfailure="yes" printsummary="yes">
+            <classpath>
+                <pathelement path="${classes}"/>
+                <path refid="build-path"/>
+                <pathelement location="${tests}"/>
+            </classpath>
+            <formatter type="xml" />
+            <test name="DataTest" todir="${report}"/>
+        </junit>
+        <echo>Start report</echo>
+        <junitreport todir="${report}">
+            <fileset dir="${report}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="noframes" todir="${report}"/>
+        </junitreport>
+        <echo>End report</echo>
+        <delete file="${dt}" />
+        <delete file="${jf}" />
+        <echo>Git add</echo>
+        <exec executable="git">
+            <arg value="add"/>
+            <arg value="${report}/*"/>
+        </exec>
+        <echo>Git commit</echo>
+        <exec executable="git">
+            <arg value="commit"/>
+            <arg value="-m"/>
+            <arg value="Haskell"/>
+        </exec>
     </target>
 
 </project>

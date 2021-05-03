@@ -7,18 +7,19 @@ import org.springframework.stereotype.Component;
 
 import javax.management.Notification;
 
-@ManagedResource(objectName = "weblab4:name=AreaMBeanNotifier")
+@ManagedResource(objectName = "weblab4:name=NotifierMBean")
 @Component
-public class AreaMBeanNotifier implements NotificationPublisherAware {
+public class NotifierMBean implements NotificationPublisherAware {
     private NotificationPublisher notificationPublisher;
+    private long seqNumber = 0;
 
     @Override
     public void setNotificationPublisher(NotificationPublisher notificationPublisher) {
         this.notificationPublisher = notificationPublisher;
     }
 
-    public void sendNotification(String type, long sequenceNumber, String message) {
-        notificationPublisher.sendNotification(new Notification(type, this, sequenceNumber, message));
+    public void sendNotification(String type, String message) {
+        notificationPublisher.sendNotification(new Notification(type, this, seqNumber++, message));
     }
 
 }
